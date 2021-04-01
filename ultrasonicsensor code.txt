@@ -1,0 +1,28 @@
+#include <SoftwareSerial.h>
+SoftwareSerial ESP(10,11); 
+const int trigger = 2;
+const int echo = 3;
+long T;
+float distanceCM;                     //Declare the variables to calculate the distance
+void setup()
+{
+  pinMode(trigger, OUTPUT);           // sets the trigger pin as output
+  pinMode(echo, INPUT);               // sets the echo pin as input
+  Serial.begin(115200);
+  ESP.begin(115200);
+}
+void loop()
+{
+  digitalWrite(trigger, LOW);        // sets the trigger pin off
+  delay(1);                           // waits for a second
+  digitalWrite(trigger, HIGH);       //sets the trigger pin on
+  delayMicroseconds(10);
+  digitalWrite(trigger, LOW);
+  T = pulseIn(echo, HIGH);          //wait for the ECHO pin go HIGH, then start measuring the pulse length until it goes LOW again.
+  distanceCM = T * 0.034;           //calculate the distance on serial monitor
+  distanceCM = distanceCM / 2;      
+  Serial.print("Distance in cm: ");
+  Serial.println(distanceCM);
+  ESP.print(distanceCM);
+  delay(1000);
+}

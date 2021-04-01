@@ -1,0 +1,42 @@
+#include "ThingSpeak.h"
+#include <WiFi.h>
+
+//-------- Enter Your Wi-Fi Details -----//
+char ssid[] = "Suchitra";  //SSID
+char pass[] = "9439391440"; //Password
+//--------------------------------------//
+
+WiFiClient  client;                              //Creates a client that can connect to to a specified internet IP address and port as defined in client.
+
+unsigned long myChannelField = 1335163;         // Channel ID
+const int ChannelField = 1;                     // Which To Field Write
+const char * myWriteAPIKey = "3Z3MQL90ZJAL77X1"; // Write API Key
+
+String value = "";
+void setup()
+{
+  Serial.begin(115200);                          //Sets the data rate in bits per second (baud) for serial data transmission.
+  WiFi.mode(WIFI_STA);
+  ThingSpeak.begin(client);
+}
+void loop()                                    // loop function that executes repeatedly
+{
+  if (Serial.available() > 0)                  //  It will only send data when the received data is greater than 0.
+  {
+    while (Serial.available() > 0)
+    {
+      int inChar = Serial.read();             // It will read the incoming or arriving data byte  
+      value += (char)inChar;
+    }
+  }
+  if (WiFi.status() != WL_CONNECTED)          //assigned when connected to a WiFi network;
+  {
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      WiFi.begin(ssid, pass);                //the SSID (Service Set Identifier) is the name of the WiFi network you want to connect to.
+      delay(5000);                           // wait 5 seconds for connection
+    }
+  }
+  ThingSpeak.writeField(myChannelField, ChannelField, value, myWriteAPIKey);  //Update in ThingSpeak
+  value = "";
+}
